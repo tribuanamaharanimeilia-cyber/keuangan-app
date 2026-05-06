@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Catatan Keuangan</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+  body {
+    font-family: Arial;
+    background: linear-gradient(135deg, #74ebd5, #acb6e5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .container {
+  width: 350px;  
+  padding: 15px;
+  margin: auto;
+}
+
+  input, select, button {
+    width: 100%;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+  }
+
+li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  background: #f9f9f9;
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 10px;
+}
+  .hapus { background:red; color:white; }
+  .edit { background:orange; color:white; }
+
+  canvas {
+    margin-top: 10px;
+  }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>💰 Catatan Keuangan</h2>
+
+<input id="desc" placeholder="Deskripsi">
+<input id="jumlah" type="number" placeholder="Jumlah">
+
+<select id="tipe">
+  <option value="masuk">Pemasukan</option>
+  <option value="keluar">Pengeluaran</option>
+</select>
+
+<button onclick="tambah()">Tambah</button>
+
+<h3>Total Saldo: <span id="total">0</span></h3>
+
+<ul id="list"></ul>
+
+<canvas id="chart"></canvas>
+
+</div>
+
+<script>
+let chart;
+
+async function loadData() {
+  const res = await fetch("/data");
+  const data = await res.json();
+
+  const list = document.getElementById("list");
+  const totalEl = document.getElementById("total");
+
+  list.innerHTML = "";
+
+  let total = 0;
+  let masuk = 0;
+  let keluar = 0;
+
+  data.forEach(item => {
+    const li = document.createElement("li");
+
+    let warna = item.tipe === "masuk" ? "green" : "red";
+
+li.innerHTML = `
+  <div>
+    <strong>${item.deskripsi}</strong><br>
+    <small>${item.tipe}</small>
+  </div>
+
+  <div style="text-align:right; color:${warna}">
+    Rp ${Number(item.jumlah).toLocaleString("id-ID")}
+  </div>
+
+  <div>
+    <button class="edit" onclick="edit(${item.id})">✏️</button>
+    <button class="hapus" onclick="hapus(${item.id})">🗑️</button>
+  </div>
+`;
+
+    list.appendChild(li);
+
+    if (item.tipe === "masuk") {
+      total += item.jumlah;
+      masuk += item.jumlah;
+    } else {
+      total -= item.jumlah;
+      keluar += item.jumlah;
+    }
+  });
+
+  totalEl.innerText = total;
+
+  renderChart(masuk, keluar);
+}
+
+function renderChart(masuk, keluar) {
+  const ctx = document.getElementById("chart");
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels: ["Masuk", "Keluar"],
+      datasets: [{
+        data: [masuk, keluar]
+      }]
+    }
+  });
+}
+
+async function tambah() {
+  const deskripsi = document.getElementById("desc").value;
+  const jumlah = document.getElementById("jumlah").value;
+  const tipe = document.getElementById("tipe").value;
+
+  await fetch("/data", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ deskripsi, jumlah, tipe })
+  });
+
+  loadData();
+}
+
+async function hapus(id) {
+  await fetch(`/data/${id}`, { method:"DELETE" });
+  loadData();
+}
+
+async function edit(id) {
+  const deskripsi = prompt("Deskripsi baru:");
+  const jumlah = prompt("Jumlah baru:");
+  const tipe = prompt("masuk / keluar:");
+
+  await fetch(`/data/${id}`, {
+    method:"PUT",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ deskripsi, jumlah, tipe })
+  });
+
+  loadData();
+}
+
+loadData();
+</script>
+
+</body>
+</html>
