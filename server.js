@@ -3,16 +3,17 @@ require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.get("/", (req, res) => {
-  res.send("WEB HIDUP");
-});
-// app.use(express.static("public"));
 
+// STATIC FILE
+app.use(express.static(path.join(__dirname, "public")));
+
+// DATABASE
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -20,12 +21,21 @@ const pool = new Pool({
   },
 });
 
-// TEST ROOT
+// TEST DATABASE
+pool.connect()
+  .then(() => {
+    console.log("DB CONNECTED");
+  })
+  .catch((err) => {
+    console.error("DB ERROR:", err);
+  });
+
+// ROOT
 app.get("/", (req, res) => {
-  res.send("Server jalan");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// AMBIL DATA
+// GET DATA
 app.get("/data", async (req, res) => {
   try {
 
@@ -37,17 +47,16 @@ app.get("/data", async (req, res) => {
 
   } catch (err) {
 
-    console.error(err);
+    console.error("GET ERROR:", err);
 
     res.status(500).json({
-      error: err.message
+      error: err.message,
     });
   }
 });
 
 // TAMBAH DATA
 app.post("/data", async (req, res) => {
-
   try {
 
     const { deskripsi, jumlah, tipe } = req.body;
@@ -58,22 +67,21 @@ app.post("/data", async (req, res) => {
     );
 
     res.json({
-      success: true
+      success: true,
     });
 
   } catch (err) {
 
-    console.error(err);
+    console.error("POST ERROR:", err);
 
     res.status(500).json({
-      error: err.message
+      error: err.message,
     });
   }
 });
 
-// EDIT
+// EDIT DATA
 app.put("/data/:id", async (req, res) => {
-
   try {
 
     const { deskripsi, jumlah, tipe } = req.body;
@@ -86,22 +94,21 @@ app.put("/data/:id", async (req, res) => {
     );
 
     res.json({
-      success: true
+      success: true,
     });
 
   } catch (err) {
 
-    console.error(err);
+    console.error("PUT ERROR:", err);
 
     res.status(500).json({
-      error: err.message
+      error: err.message,
     });
   }
 });
 
-// DELETE
+// DELETE DATA
 app.delete("/data/:id", async (req, res) => {
-
   try {
 
     const id = req.params.id;
@@ -112,19 +119,20 @@ app.delete("/data/:id", async (req, res) => {
     );
 
     res.json({
-      success: true
+      success: true,
     });
 
   } catch (err) {
 
-    console.error(err);
+    console.error("DELETE ERROR:", err);
 
     res.status(500).json({
-      error: err.message
+      error: err.message,
     });
   }
 });
 
+// PORT
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, "0.0.0.0", () => {
