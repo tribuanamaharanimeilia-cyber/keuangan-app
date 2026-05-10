@@ -1,77 +1,206 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <title>Catatan Keuangan</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Catatan Keuangan Modern</title>
 
-  <style>
-  body {
-    font-family: Arial;
-    background: linear-gradient(135deg, #74ebd5, #acb6e5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  .container {
-  width: 350px;  
-  padding: 15px;
-  margin: auto;
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-  input, select, button {
-    width: 100%;
-    margin: 5px 0;
-    padding: 10px;
-    border-radius: 8px;
-  }
-
-  button {
-    background: #4CAF50;
-    color: white;
-    border: none;
-  }
-
-li {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
-  gap: 10px;
-  background: #f9f9f9;
-  margin: 8px 0;
-  padding: 10px;
-  border-radius: 10px;
+body{
+  font-family:'Poppins', sans-serif;
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
 }
-  .hapus { background:red; color:white; }
-  .edit { background:orange; color:white; }
 
-  canvas {
-    margin-top: 10px;
-  }
-  </style>
+.container{
+  width:100%;
+  max-width:500px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(15px);
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:25px;
+  padding:25px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.2);
+  color:white;
+}
+
+h2{
+  text-align:center;
+  margin-bottom:20px;
+  font-size:28px;
+  font-weight:700;
+}
+
+.balance-card{
+  background: rgba(255,255,255,0.15);
+  border-radius:20px;
+  padding:20px;
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.balance-card h3{
+  font-size:16px;
+  font-weight:400;
+  margin-bottom:8px;
+}
+
+.balance-card span{
+  font-size:32px;
+  font-weight:700;
+}
+
+.form-group{
+  margin-bottom:15px;
+}
+
+input, select{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:15px;
+  background: rgba(255,255,255,0.2);
+  color:white;
+  outline:none;
+  font-size:14px;
+}
+
+input::placeholder{
+  color:#eee;
+}
+
+select option{
+  color:black;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:15px;
+  background:#00e676;
+  color:white;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  opacity:0.9;
+}
+
+.list{
+  margin-top:20px;
+  max-height:250px;
+  overflow-y:auto;
+}
+
+.item{
+  background: rgba(255,255,255,0.12);
+  border-radius:18px;
+  padding:15px;
+  margin-bottom:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.item-left h4{
+  font-size:15px;
+}
+
+.item-left p{
+  font-size:12px;
+  opacity:0.8;
+}
+
+.amount{
+  font-weight:700;
+}
+
+.masuk{
+  color:#00ff9d;
+}
+
+.keluar{
+  color:#ff6b81;
+}
+
+.action{
+  display:flex;
+  gap:6px;
+}
+
+.edit{
+  background:orange;
+  width:40px;
+  height:40px;
+  border-radius:10px;
+}
+
+.hapus{
+  background:red;
+  width:40px;
+  height:40px;
+  border-radius:10px;
+}
+
+canvas{
+  margin-top:25px;
+  background:white;
+  border-radius:20px;
+  padding:10px;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
 
-<h2>💰 Catatan Keuangan</h2>
+<h2>💸 Catatan Keuangan</h2>
 
-<input id="desc" placeholder="Deskripsi">
-<input id="jumlah" type="number" placeholder="Jumlah">
+<div class="balance-card">
+  <h3>Total Saldo</h3>
+  <span id="total">Rp 0</span>
+</div>
 
-<select id="tipe">
-  <option value="masuk">Pemasukan</option>
-  <option value="keluar">Pengeluaran</option>
-</select>
+<div class="form-group">
+  <input id="desc" placeholder="Masukkan deskripsi">
+</div>
 
-<button onclick="tambah()">Tambah</button>
+<div class="form-group">
+  <input id="jumlah" type="number" placeholder="Masukkan jumlah">
+</div>
 
-<h3>Total Saldo: <span id="total">0</span></h3>
+<div class="form-group">
+  <select id="tipe">
+    <option value="masuk">Pemasukan</option>
+    <option value="keluar">Pengeluaran</option>
+  </select>
+</div>
 
-<ul id="list"></ul>
+<button onclick="tambah()">+ Tambah Transaksi</button>
+
+<div class="list" id="list"></div>
 
 <canvas id="chart"></canvas>
 
@@ -94,86 +223,135 @@ async function loadData() {
   let keluar = 0;
 
   data.forEach(item => {
-    const li = document.createElement("li");
 
-    let warna = item.tipe === "masuk" ? "green" : "red";
+    const div = document.createElement("div");
+    div.className = "item";
 
-li.innerHTML = `
-  <div>
-    <strong>${item.deskripsi}</strong><br>
-    <small>${item.tipe}</small>
-  </div>
+    let kelas = item.tipe === "masuk" ? "masuk" : "keluar";
+    let simbol = item.tipe === "masuk" ? "+" : "-";
 
-  <div style="text-align:right; color:${warna}">
-    Rp ${Number(item.jumlah).toLocaleString("id-ID")}
-  </div>
+    div.innerHTML = `
+      <div class="item-left">
+        <h4>${item.deskripsi}</h4>
+        <p>${item.tipe}</p>
+      </div>
 
-  <div>
-    <button class="edit" onclick="edit(${item.id})">✏️</button>
-    <button class="hapus" onclick="hapus(${item.id})">🗑️</button>
-  </div>
-`;
+      <div>
+        <div class="amount ${kelas}">
+          ${simbol} Rp ${Number(item.jumlah).toLocaleString("id-ID")}
+        </div>
 
-    list.appendChild(li);
+        <div class="action">
+          <button class="edit" onclick="edit(${item.id})">✏️</button>
+          <button class="hapus" onclick="hapus(${item.id})">🗑️</button>
+        </div>
+      </div>
+    `;
 
-    if (item.tipe === "masuk") {
+    list.appendChild(div);
+
+    if(item.tipe === "masuk"){
       total += item.jumlah;
       masuk += item.jumlah;
-    } else {
+    }else{
       total -= item.jumlah;
       keluar += item.jumlah;
     }
   });
 
-  totalEl.innerText = total;
+  totalEl.innerText =
+    "Rp " + total.toLocaleString("id-ID");
 
   renderChart(masuk, keluar);
 }
 
-function renderChart(masuk, keluar) {
+function renderChart(masuk, keluar){
+
   const ctx = document.getElementById("chart");
 
-  if (chart) chart.destroy();
+  if(chart) chart.destroy();
 
-  chart = new Chart(ctx, {
-    type: "pie",
-    data: {
-      labels: ["Masuk", "Keluar"],
-      datasets: [{
-        data: [masuk, keluar]
+  chart = new Chart(ctx,{
+    type:"doughnut",
+    data:{
+      labels:["Pemasukan","Pengeluaran"],
+      datasets:[{
+        data:[masuk, keluar],
+        backgroundColor:[
+          "#00e676",
+          "#ff5252"
+        ],
+        borderWidth:0
       }]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{
+          labels:{
+            color:"black"
+          }
+        }
+      }
     }
   });
 }
 
-async function tambah() {
-  const deskripsi = document.getElementById("desc").value;
-  const jumlah = document.getElementById("jumlah").value;
-  const tipe = document.getElementById("tipe").value;
+async function tambah(){
 
-  await fetch("/data", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ deskripsi, jumlah, tipe })
+  const deskripsi =
+    document.getElementById("desc").value;
+
+  const jumlah =
+    document.getElementById("jumlah").value;
+
+  const tipe =
+    document.getElementById("tipe").value;
+
+  await fetch("/data",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      deskripsi,
+      jumlah,
+      tipe
+    })
   });
 
   loadData();
 }
 
-async function hapus(id) {
-  await fetch(`/data/${id}`, { method:"DELETE" });
+async function hapus(id){
+  await fetch(`/data/${id}`,{
+    method:"DELETE"
+  });
+
   loadData();
 }
 
-async function edit(id) {
-  const deskripsi = prompt("Deskripsi baru:");
-  const jumlah = prompt("Jumlah baru:");
-  const tipe = prompt("masuk / keluar:");
+async function edit(id){
 
-  await fetch(`/data/${id}`, {
+  const deskripsi =
+    prompt("Deskripsi baru:");
+
+  const jumlah =
+    prompt("Jumlah baru:");
+
+  const tipe =
+    prompt("masuk / keluar:");
+
+  await fetch(`/data/${id}`,{
     method:"PUT",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ deskripsi, jumlah, tipe })
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      deskripsi,
+      jumlah,
+      tipe
+    })
   });
 
   loadData();
