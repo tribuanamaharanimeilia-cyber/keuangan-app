@@ -23,14 +23,19 @@ app.get("/data", async (req, res) => {
 });
 
 app.post("/data", async (req, res) => {
-  const { deskripsi, jumlah, tipe } = req.body;
+  try {
+    const { deskripsi, jumlah, tipe } = req.body;
 
-  await pool.query(
-    "INSERT INTO keuangan (deskripsi, jumlah, tipe) VALUES ($1, $2, $3)",
-    [deskripsi, jumlah, tipe]
-  );
+    await pool.query(
+      "INSERT INTO keuangan (deskripsi, jumlah, tipe) VALUES ($1, $2, $3)",
+      [deskripsi, jumlah, tipe]
+    );
 
-  res.send("OK");
+    res.send("OK");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Database Error");
+  }
 });
 
 app.listen(3000, () => console.log("Server jalan di 3000"));
