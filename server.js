@@ -12,6 +12,7 @@ app.use(express.json());
 
 // STATIC FILE
 app.use(express.static(path.join(__dirname, "public")));
+// app.use(express.static(path.join(__dirname, "public")));
 
 // DATABASE
 const pool = new Pool({
@@ -32,7 +33,7 @@ pool.connect()
 
 // ROOT
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.send("APP HIDUP");
 });
 
 // GET DATA
