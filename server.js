@@ -17,12 +17,12 @@ const pool = new Pool({
   },
 });
 
-pool.connect()
-  .then(() => console.log("DB CONNECTED"))
-  .catch(err => console.error("DB ERROR:", err));
+// TEST ROOT
+app.get("/", (req, res) => {
+  res.send("Server jalan");
+});
 
-
-// GET DATA
+// AMBIL DATA
 app.get("/data", async (req, res) => {
   try {
 
@@ -33,11 +33,14 @@ app.get("/data", async (req, res) => {
     res.json(result.rows);
 
   } catch (err) {
+
     console.error(err);
-    res.status(500).send("Error ambil data");
+
+    res.status(500).json({
+      error: err.message
+    });
   }
 });
-
 
 // TAMBAH DATA
 app.post("/data", async (req, res) => {
@@ -51,16 +54,21 @@ app.post("/data", async (req, res) => {
       [deskripsi, jumlah, tipe]
     );
 
-    res.send("Berhasil tambah");
+    res.json({
+      success: true
+    });
 
   } catch (err) {
+
     console.error(err);
-    res.status(500).send("Database Error");
+
+    res.status(500).json({
+      error: err.message
+    });
   }
 });
 
-
-// EDIT DATA
+// EDIT
 app.put("/data/:id", async (req, res) => {
 
   try {
@@ -74,16 +82,21 @@ app.put("/data/:id", async (req, res) => {
       [deskripsi, jumlah, tipe, id]
     );
 
-    res.send("Updated");
+    res.json({
+      success: true
+    });
 
   } catch (err) {
+
     console.error(err);
-    res.status(500).send("Update Error");
+
+    res.status(500).json({
+      error: err.message
+    });
   }
 });
 
-
-// HAPUS DATA
+// DELETE
 app.delete("/data/:id", async (req, res) => {
 
   try {
@@ -95,18 +108,22 @@ app.delete("/data/:id", async (req, res) => {
       [id]
     );
 
-    res.send("Deleted");
+    res.json({
+      success: true
+    });
 
   } catch (err) {
+
     console.error(err);
-    res.status(500).send("Delete Error");
+
+    res.status(500).json({
+      error: err.message
+    });
   }
 });
 
-
-// SERVER
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server jalan di ${PORT}`);
+  console.log(`Server running on ${PORT}`);
 });
